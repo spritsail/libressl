@@ -66,6 +66,20 @@ RUN cp -d glibc-build/out/lib/*.so "$PREFIX/lib" && \
     echo '/usr/lib' > "$PREFIX/etc/ld.so.conf" && \
     ldconfig -r "$PREFIX"
 
+# Build and install LibreSSL
+ARG LIBRE_VER=2.5.4
+RUN mkdir -p libressl/build && cd libressl && \
+    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRE_VER}.tar.gz \
+        | tar xz --strip-components=1 && \
+    ./config --prefix="$(pwd)/build" && \
+    make && make install
+
+RUN cp -d libressl/build/lib/*.so* /output/lib && \
+    cp -d libressl/build/bin/openssl /output/bin && \
+    ln -s /lib/libssl.so /output/lib/libssl.so.1.0.0 && \
+    ln -s /lib/libtls.so /output/lib/libtls.so.1.0.0 && \
+    ln -s /lib/libcrypto.so /output/lib/libcrypto.so.1.0.0
+
 WORKDIR $PREFIX
 
 # Add root user and group
