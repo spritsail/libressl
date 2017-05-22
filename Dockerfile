@@ -74,11 +74,11 @@ RUN mkdir -p libressl/build && cd libressl && \
     ./config --prefix="$(pwd)/build" && \
     make && make install
 
-RUN cp -d libressl/build/lib/*.so* /output/lib && \
-    cp -d libressl/build/bin/openssl /output/bin && \
-    ln -s /lib/libssl.so /output/lib/libssl.so.1.0.0 && \
-    ln -s /lib/libtls.so /output/lib/libtls.so.1.0.0 && \
-    ln -s /lib/libcrypto.so /output/lib/libcrypto.so.1.0.0
+RUN cp -d libressl/build/lib/*.so* "$PREFIX/lib" && \
+    cp -d libressl/build/bin/openssl "$PREFIX/bin" && \
+    ln -s /lib/libssl.so "$PREFIX/libssl.so.1.0.0" && \
+    ln -s /lib/libtls.so "$PREFIX/libtls.so.1.0.0" && \
+    ln -s /lib/libcrypto.so "$PREFIX/libcrypto.so.1.0.0"
 
 WORKDIR $PREFIX
 
