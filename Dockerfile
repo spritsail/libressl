@@ -35,7 +35,7 @@ RUN cp -d libressl/build/lib/*.so* "${PREFIX}/lib" && \
 
 # =============
 
-FROM adamant/busybox:latest
+FROM busybox:glibc
 WORKDIR /
 COPY --from=builder /output/ /
 CMD ["sh"]
