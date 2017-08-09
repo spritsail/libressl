@@ -16,8 +16,9 @@ pipeline:
     environment:
       - DOCKER_HOST=tcp://docker:2375
     commands:
-      - docker run --rm devbuild /bin/sh -xec 'test -f /lib/libssl-*.so'
-      - docker run --rm devbuild /bin/sh -xec 'openssl'
+      - docker run --rm devbuild /bin/sh -xec "test \"$(echo /lib/libssl*.so*)\" != '/lib/libssl*.so*'"
+      - docker run --rm devbuild /bin/sh -xec "test \"$(echo /lib/libcrypto*.so*)\" != '/lib/libcrypto*.so*'"
+      - docker run --rm devbuild /bin/sh -xec "openssl version"
 
   publish:
     image: docker
