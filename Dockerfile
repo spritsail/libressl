@@ -32,11 +32,7 @@ RUN cp -d libressl/build/lib/*.so* "${PREFIX}/lib" && \
     ln -s /lib/libtls.so "${PREFIX}/lib/libtls.so.1.0.0" && \
     ln -s /lib/libcrypto.so "${PREFIX}/lib/libcrypto.so.1.0.0"
 
-
 # =============
 
-FROM busybox:glibc
-WORKDIR /
+FROM adamant/busybox
 COPY --from=builder /output/ /
-CMD ["sh"]
-
