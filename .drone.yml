@@ -28,3 +28,15 @@ pipeline:
       - docker login -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag devbuild adamant/busybox:libressl
       - docker push adamant/busybox
+
+notify:
+    downstream:
+      secrets: [ DOWNSTREAM_TOKEN ]
+      repositories:
+        - Adam-Ant/docker-plex-tiny@master
+        - Adam-Ant/docker-plex-tiny@pass
+      token: $downstream_token
+      when:
+        event: push
+        branch: master
+        success: true
