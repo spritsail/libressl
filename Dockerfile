@@ -23,14 +23,18 @@ ARG LDFLAGS="-Wl,-O1,--sort-common -Wl,-s"
 RUN mkdir -p libressl/build && cd libressl && \
     curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRE_VER}.tar.gz \
         | tar xz --strip-components=1 && \
-    ./config --prefix="$(pwd)/build" && \
-    make && make install
+    ./configure --prefix='' && \
+    make -j "$(nproc)" && \
+    make DESTDIR="$(pwd)/build" install
 
 RUN cp -d libressl/build/lib/*.so* "${PREFIX}/lib" && \
     cp -d libressl/build/bin/openssl "${PREFIX}/bin" && \
-    ln -s /lib/libssl.so "${PREFIX}/lib/libssl.so.1.0.0" && \
-    ln -s /lib/libtls.so "${PREFIX}/lib/libtls.so.1.0.0" && \
-    ln -s /lib/libcrypto.so "${PREFIX}/lib/libcrypto.so.1.0.0"
+    mkdir -p "${PREFIX}/etc/ssl" && \
+    cp -d libressl/build/etc/ssl/openssl.cnf "${PREFIX}/etc/ssl" && \
+    cd "${PREFIX}/lib" && \
+    ln -s libssl.so "${PREFIX}/lib/libssl.so.1.0.0" && \
+    ln -s libtls.so "${PREFIX}/lib/libtls.so.1.0.0" && \
+    ln -s libcrypto.so "${PREFIX}/lib/libcrypto.so.1.0.0"
 
 # =============
 
