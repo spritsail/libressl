@@ -1,23 +1,17 @@
-FROM debian:stretch-slim as builder
+FROM frebib/debian-builder as builder
 
 ARG ARCH=x86_64
-ARG DEBIAN_FRONTEND=noninteractive
 ARG LIBRE_VER=2.5.4
 ARG PREFIX=/output
 
 WORKDIR $PREFIX
 
-#Set up our dependencies, configure the output filesystem a bit
-RUN apt-get update -qy && \
-    apt-get install -qy curl build-essential gawk linux-libc-dev && \
-    mkdir -p bin lib && \
+# Configure the output filesystem a bit
+RUN mkdir -p bin lib && \
     # This is probably only relevant on 64bit systems?
     ln -sv lib lib64
 
 WORKDIR /tmp
-
-ARG CFLAGS="-Os -pipe -fstack-protector-strong"
-ARG LDFLAGS="-Wl,-O1,--sort-common -Wl,-s"
 
 # Build and install LibreSSL
 RUN mkdir -p libressl/build && cd libressl && \
