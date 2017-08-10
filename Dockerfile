@@ -1,7 +1,7 @@
 FROM frebib/debian-builder as builder
 
 ARG ARCH=x86_64
-ARG LIBRE_VER=2.5.4
+ARG LIBRE_VER=2.5.5
 ARG PREFIX=/output
 
 WORKDIR $PREFIX
