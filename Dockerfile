@@ -7,7 +7,7 @@ ARG PREFIX=/output
 WORKDIR $PREFIX
 
 # Configure the output filesystem a bit
-RUN mkdir -p usr/bin usr/lib etc/ssl
+RUN mkdir -p usr/bin usr/lib etc/ssl/certs
 
 WORKDIR /tmp
 
@@ -27,6 +27,9 @@ RUN cp -d libressl/build/lib/*.so* "${PREFIX}/usr/lib" && \
     ln -s libssl.so libssl.so.1.0.0 && \
     ln -s libtls.so libtls.so.1.0.0 && \
     ln -s libcrypto.so libcrypto.so.1.0.0
+
+RUN update-ca-certificates && \
+    cp /etc/ssl/certs/ca-certificates.pem "${PREFIX}/etc/ssl/certs"
 
 # =============
 
