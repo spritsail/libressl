@@ -7,9 +7,7 @@ ARG PREFIX=/output
 WORKDIR $PREFIX
 
 # Configure the output filesystem a bit
-RUN mkdir -p bin lib && \
-    # This is probably only relevant on 64bit systems?
-    ln -sv lib lib64
+RUN mkdir -p usr/bin usr/lib etc/ssl
 
 WORKDIR /tmp
 
@@ -21,14 +19,14 @@ RUN mkdir -p libressl/build && cd libressl && \
     make -j "$(nproc)" && \
     make DESTDIR="$(pwd)/build" install
 
-RUN cp -d libressl/build/lib/*.so* "${PREFIX}/lib" && \
-    cp -d libressl/build/bin/openssl "${PREFIX}/bin" && \
+RUN cp -d libressl/build/lib/*.so* "${PREFIX}/usr/lib" && \
+    cp -d libressl/build/bin/openssl "${PREFIX}/usr/bin" && \
     mkdir -p "${PREFIX}/etc/ssl" && \
     cp -d libressl/build/etc/ssl/openssl.cnf "${PREFIX}/etc/ssl" && \
-    cd "${PREFIX}/lib" && \
-    ln -s libssl.so "${PREFIX}/lib/libssl.so.1.0.0" && \
-    ln -s libtls.so "${PREFIX}/lib/libtls.so.1.0.0" && \
-    ln -s libcrypto.so "${PREFIX}/lib/libcrypto.so.1.0.0"
+    cd "${PREFIX}/usr/lib" && \
+    ln -s libssl.so libssl.so.1.0.0 && \
+    ln -s libtls.so libtls.so.1.0.0 && \
+    ln -s libcrypto.so libcrypto.so.1.0.0
 
 # =============
 
