@@ -29,7 +29,7 @@ RUN cp -d libressl/build/lib/*.so* "${PREFIX}/usr/lib" && \
     ln -s libcrypto.so libcrypto.so.1.0.0
 
 RUN update-ca-certificates && \
-    cp /etc/ssl/certs/ca-certificates.pem "${PREFIX}/etc/ssl/certs"
+    cp /etc/ssl/certs/ca-certificates.crt "${PREFIX}/etc/ssl/certs"
 
 # =============
 
