@@ -1,34 +1,32 @@
-services:
-  docker:
-    image: docker:dind
-    privileged: true
-
 pipeline:
   build:
     image: docker
-    environment:
-      - DOCKER_HOST=tcp://docker:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker build -t devbuild .
+      - docker build --no-cache --pull -t busybox-lssl-dev .
 
   test:
     image: docker
-    environment:
-      - DOCKER_HOST=tcp://docker:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker run --rm devbuild /bin/sh -xec "test \"$(echo /lib/libssl*.so*)\" != '/lib/libssl*.so*'"
-      - docker run --rm devbuild /bin/sh -xec "test \"$(echo /lib/libcrypto*.so*)\" != '/lib/libcrypto*.so*'"
-      - docker run --rm devbuild /bin/sh -xec "openssl version"
+      - docker run --rm busybox-lssl-dev /bin/sh -xec "test \"$(echo /lib/libssl*.so*)\" != '/lib/libssl*.so*'"
+      - docker run --rm busybox-lssl-dev /bin/sh -xec "test \"$(echo /lib/libcrypto*.so*)\" != '/lib/libcrypto*.so*'"
+      - docker run --rm busybox-lssl-dev /bin/sh -xec "openssl version"
 
   publish:
     image: docker
     secrets: [ DOCKER_USER, DOCKER_PASS ]
-    environment:
-      - DOCKER_HOST=tcp://docker:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    when:
+      event: [push, tag, deployment]
     commands:
       - docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - docker tag devbuild adamant/busybox:libressl
+      - docker tag busybox-lssl-dev adamant/busybox:libressl
       - docker push adamant/busybox
+      - docker rmi busybox-lssl-dev adamant/busybox
 
   downstream:
     image: plugins/downstream
@@ -40,6 +38,7 @@ pipeline:
     repositories:
       - Adam-Ant/docker-plex-tiny@master
       - Adam-Ant/docker-plex-tiny@pass
+      - Adam-Ant/docker-amp
     when:
       event:  [ push, tag, deployment]
       status: [ success ]
