@@ -1,7 +1,7 @@
 FROM frebib/debian-builder as builder
 
 ARG ARCH=x86_64
-ARG LIBRE_VER=2.5.5
+ARG LIBRE_VER=2.6.1
 ARG PREFIX=/output
 
 WORKDIR $PREFIX
@@ -12,21 +12,26 @@ RUN mkdir -p usr/bin usr/lib etc/ssl/certs
 WORKDIR /tmp
 
 # Build and install LibreSSL
-RUN mkdir -p libressl/build && cd libressl && \
-    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRE_VER}.tar.gz \
-        | tar xz --strip-components=1 && \
-    ./configure --prefix='' && \
+RUN curl -sSL https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRE_VER}.tar.gz | tar xz && \
+    cd libressl-${LIBRE_VER} && \
+    ./configure \
+        --prefix= \
+        --exec-prefix=/usr && \
     make -j "$(nproc)" && \
     make DESTDIR="$(pwd)/build" install
 
-RUN cp -d libressl/build/lib/*.so* "${PREFIX}/usr/lib" && \
-    cp -d libressl/build/bin/openssl "${PREFIX}/usr/bin" && \
+RUN cd libressl-${LIBRE_VER} && \
+    cp -d build/usr/lib/*.so* "${PREFIX}/usr/lib" && \
+    cp -d build/usr/bin/openssl "${PREFIX}/usr/bin" && \
     mkdir -p "${PREFIX}/etc/ssl" && \
-    cp -d libressl/build/etc/ssl/openssl.cnf "${PREFIX}/etc/ssl" && \
+    cp -d build/etc/ssl/openssl.cnf "${PREFIX}/etc/ssl" && \
     cd "${PREFIX}/usr/lib" && \
     ln -s libssl.so libssl.so.1.0.0 && \
+    ln -s libssl.so libssl.so.1.0 && \
     ln -s libtls.so libtls.so.1.0.0 && \
-    ln -s libcrypto.so libcrypto.so.1.0.0
+    ln -s libtls.so libtls.so.1.0 && \
+    ln -s libcrypto.so libcrypto.so.1.0.0 && \
+    ln -s libcrypto.so libcrypto.so.1.0
 
 RUN update-ca-certificates && \
     cp /etc/ssl/certs/ca-certificates.crt "${PREFIX}/etc/ssl/certs"
