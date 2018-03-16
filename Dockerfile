@@ -1,4 +1,4 @@
-FROM frebib/debian-builder as builder
+FROM spritsail/debian-builder as builder
 
 ARG ARCH=x86_64
 ARG LIBRE_VER=2.6.4
@@ -39,5 +39,5 @@ RUN update-ca-certificates && \
 
 # =============
 
-FROM adamant/busybox
+FROM spritsail/busybox
 COPY --from=builder /output/ /

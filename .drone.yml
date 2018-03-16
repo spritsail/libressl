@@ -1,44 +1,40 @@
 pipeline:
   build:
-    image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - docker build --no-cache --pull -t busybox-lssl-dev .
+    image: spritsail/docker-build
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    repo: busybox-lssl-dev
 
   test:
     image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     commands:
       - docker run --rm busybox-lssl-dev /bin/sh -xec "test \"$(echo /lib/libssl*.so*)\" != '/lib/libssl*.so*'"
       - docker run --rm busybox-lssl-dev /bin/sh -xec "test \"$(echo /lib/libcrypto*.so*)\" != '/lib/libcrypto*.so*'"
       - docker run --rm busybox-lssl-dev /bin/sh -xec "openssl version"
 
   publish:
-    image: docker
-    secrets: [ DOCKER_USER, DOCKER_PASS ]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    when:
-      event: [push, tag, deployment]
-    commands:
-      - docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - docker tag busybox-lssl-dev adamant/busybox:libressl
-      - docker push adamant/busybox
-      - docker rmi busybox-lssl-dev adamant/busybox
+    image: spritsail/docker-publish
+    when: { branch: [ master, libressl ], event: [ push, tag, deployment ] }
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    secrets: [ docker_username, docker_password, microbadger_token ]
+    from: busybox-lssl-dev
+    repo: spritsail/busybox:libressl
 
   downstream:
     image: plugins/downstream
-    when:
-      event: [push, tag, deployment]
-    secrets: [ DOWNSTREAM_TOKEN ]
-    server: https://drone.adam-ant.co.uk
+    when: { status: [ success ], event: [ push, tag, deployment ] }
+    secrets: [ downstream_token ]
+    server: https://drone.spritsail.io
     fork: true
     repositories:
-      - Adam-Ant/docker-plex-tiny@master
-      - Adam-Ant/docker-plex-tiny@pass
-      - Adam-Ant/docker-amp
-    when:
-      event:  [ push, tag, deployment]
-      status: [ success ]
+      - spritsail/plex-media-server@master
+      - spritsail/plex-media-server@pass
+      - spritsail/amp
+
+  notify:
+    image: appleboy/drone-telegram
+    when: { status: [ success, failure ] }
+    secrets: [ telegram_token, telegram_to ]
+    message: |
+      *{{repo.owner}}/{{repo.name}} [{{commit.branch}}]*: Build #{{build.number}}: *{{uppercase build.status}}*
+      {{build.link}}
