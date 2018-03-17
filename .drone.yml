@@ -29,7 +29,8 @@ pipeline:
     repositories:
       - spritsail/plex-media-server@master
       - spritsail/plex-media-server@pass
-      - spritsail/amp
+      # TODO: Update AMP build and re-enable downstream
+      #- spritsail/amp
 
   notify:
     image: appleboy/drone-telegram
