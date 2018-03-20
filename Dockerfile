@@ -43,6 +43,8 @@ RUN update-ca-certificates && \
 
 FROM spritsail/busybox
 
+ARG LIBRE_VER
+
 LABEL maintainer="Spritsail <busybox@spritsail.io>" \
       org.label-schema.vendor="Spritsail" \
       org.label-schema.name="Busybox with LibreSSL" \
