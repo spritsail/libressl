@@ -9,22 +9,20 @@ ARG PREFIX=/output
 WORKDIR $PREFIX
 
 # Configure the output filesystem a bit
-RUN mkdir -p usr/bin usr/lib/pkgconfig etc/ssl/certs
+RUN mkdir -p usr/bin usr/lib etc/ssl/certs
 
-WORKDIR /tmp
+WORKDIR /tmp/libressl
 
 # Build and install LibreSSL
-RUN curl -sSL https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRE_VER}.tar.gz | tar xz && \
-    cd libressl-${LIBRE_VER} && \
+RUN curl -sSL https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRE_VER}.tar.gz \
+        | tar xz --strip-components=1 && \
     ./configure \
         --prefix= \
         --exec-prefix=/usr && \
     make -j "$(nproc)" && \
     make DESTDIR="$(pwd)/build" install
 
-RUN cd libressl-${LIBRE_VER} && \
-    cp -d build/usr/lib/*.so* "${PREFIX}/usr/lib" && \
-    cp -d build/usr/lib/pkgconfig/* "${PREFIX}/usr/lib/pkgconfig" && \
+RUN cp -d build/usr/lib/*.so* "${PREFIX}/usr/lib" && \
     cp -d build/usr/bin/openssl "${PREFIX}/usr/bin" && \
     mkdir -p "${PREFIX}/etc/ssl" && \
     cp -d build/etc/ssl/openssl.cnf "${PREFIX}/etc/ssl" && \
