@@ -1,16 +1,17 @@
 [hub]: https://hub.docker.com/r/spritsail/busybox
-[git]: https://github.com/spritsail/busybox
+[git]: https://github.com/spritsail/busybox/tree/libressl
 [drone]: https://drone.spritsail.io/spritsail/busybox
+[mbdg]: https://microbadger.com/images/spritsail/busybox:libressl
 [musl]: https://www.musl-libc.org/
 [uclibc]: https://www.uclibc.org/
 
 # [spritsail/busybox][hub] - A tiny image, nurtured from source
-[![](https://images.microbadger.com/badges/image/spritsail/busybox.svg)](https://microbadger.com/images/spritsail/busybox)
-[![](https://images.microbadger.com/badges/version/spritsail/busybox.svg)][hub]
-[![](https://images.microbadger.com/badges/commit/spritsail/busybox.svg)][git]
+[![](https://images.microbadger.com/badges/image/spritsail/busybox:libressl.svg)][mbdg]
+[![](https://images.microbadger.com/badges/version/spritsail/busybox:libressl.svg)][hub]
+[![](https://images.microbadger.com/badges/commit/spritsail/busybox:libressl.svg)][git]
 [![Docker Stars](https://img.shields.io/docker/stars/spritsail/busybox.svg)][hub]
 [![Docker Pulls](https://img.shields.io/docker/pulls/spritsail/busybox.svg)][hub]
-[![Build Status](https://drone.spritsail.io/api/badges/spritsail/busybox/status.svg)][drone]
+[![Build Status](https://drone.spritsail.io/api/badges/spritsail/busybox/status.svg?branch=libressl)][drone]
 
 This Docker base image has been custom crafted from source to provide just enough functionality in the tiniest footprint. Included in the image are the following:
  - GNU libc6 (glibc) - _C standard library, found in most linux distributions_ | https://www.gnu.org/software/libc/
@@ -25,8 +26,8 @@ Additionally, the following small utilities have been included for convenience a
 
 There are two main streams of this image: with and without LibreSSL. You can find the dockerfiles below
 
-* `1.0`, `latest` - [(master/dockerfile)](https://github.com/spritsail/busybox/blob/master/Dockerfile)
-* `1.0-libressl`, `libressl` - [(libressl/dockerfile)](https://github.com/spritsail/busybox/blob/libressl/Dockerfile)
+* `latest` - [(master/dockerfile)](https://github.com/spritsail/busybox/blob/master/Dockerfile)
+* `libressl` - [(libressl/dockerfile)](https://github.com/spritsail/busybox/blob/libressl/Dockerfile)
 
 ## Goals for a base image
 
