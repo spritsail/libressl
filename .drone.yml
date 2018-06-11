@@ -2,39 +2,25 @@ pipeline:
   build:
     image: spritsail/docker-build
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    repo: busybox-lssl-dev
+    repo: lssl-dev
 
   test:
     image: docker
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     commands:
-      - docker run --rm busybox-lssl-dev /bin/sh -xec "test \"$(echo /lib/libssl*.so*)\" != '/lib/libssl*.so*'"
-      - docker run --rm busybox-lssl-dev /bin/sh -xec "test \"$(echo /lib/libcrypto*.so*)\" != '/lib/libcrypto*.so*'"
-      - docker run --rm busybox-lssl-dev /bin/sh -xec "openssl version"
+      - docker run --rm lssl-dev /bin/sh -xec "test \"$(echo /lib/libssl*.so*)\" != '/lib/libssl*.so*'"
+      - docker run --rm lssl-dev /bin/sh -xec "test \"$(echo /lib/libcrypto*.so*)\" != '/lib/libcrypto*.so*'"
+      - docker run --rm lssl-dev /bin/sh -xec "openssl version"
 
   publish:
     image: spritsail/docker-publish
     when: { branch: [ master, libressl ], event: [ push, tag, deployment ] }
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     secrets: [ docker_username, docker_password, microbadger_token ]
-    from: busybox-lssl-dev
-    repo: spritsail/busybox:libressl
-
-  downstream:
-    image: plugins/downstream
-    when: { status: [ success ], event: [ push, tag, deployment ] }
-    secrets: [ downstream_token ]
-    server: https://drone.spritsail.io
-    fork: true
-    repositories:
-      - spritsail/plex-media-server@master
-      - spritsail/plex-media-server@pass
-      - spritsail/amp
+    from: lssl-dev
+    repo: spritsail/libressl
 
   notify:
-    image: appleboy/drone-telegram
+    image: spritsail/notify
     when: { status: [ success, failure ] }
-    secrets: [ telegram_token, telegram_to ]
-    message: |
-      *{{repo.owner}}/{{repo.name}} [{{commit.branch}}]*: Build #{{build.number}}: *{{uppercase build.status}}*
-      {{build.link}}
+    secrets: [ webhook_url, notify_token ]

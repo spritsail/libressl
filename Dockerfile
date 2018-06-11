@@ -43,10 +43,10 @@ FROM spritsail/busybox
 
 ARG LIBRE_VER
 
-LABEL maintainer="Spritsail <busybox@spritsail.io>" \
+LABEL maintainer="Spritsail <libressl@spritsail.io>" \
       org.label-schema.vendor="Spritsail" \
       org.label-schema.name="Busybox with LibreSSL" \
-      org.label-schema.url="https://github.com/spritsail/busybox/tree/libressl" \
+      org.label-schema.url="https://github.com/spritsail/libressl" \
       org.label-schema.description="Busybox, GNU libc and LibreSSL built from source" \
       org.label-schema.version=${LIBRE_VER} \
       io.spritsail.version.libressl=${LIBRE_VER}
