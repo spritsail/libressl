@@ -1,4 +1,4 @@
-ARG LIBRE_VER=2.7.2
+ARG LIBRE_VER=2.7.4
 
 FROM spritsail/debian-builder as builder
 
