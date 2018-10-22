@@ -8,15 +8,13 @@ pipeline:
     image: docker
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     commands:
-      - docker run --rm lssl-dev /bin/sh -xec "test \"$(echo /lib/libssl*.so*)\" != '/lib/libssl*.so*'"
-      - docker run --rm lssl-dev /bin/sh -xec "test \"$(echo /lib/libcrypto*.so*)\" != '/lib/libcrypto*.so*'"
       - docker run --rm lssl-dev /bin/sh -xec "openssl version"
 
   publish:
     image: spritsail/docker-publish
-    when: { branch: [ master, libressl ], event: [ push, tag, deployment ] }
+    when: { branch: [ master ], event: [ push, tag, deployment ] }
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    secrets: [ docker_username, docker_password, microbadger_token ]
+    secrets: [ docker_username, docker_password ]
     from: lssl-dev
     repo: spritsail/libressl
 
