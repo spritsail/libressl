@@ -17,6 +17,9 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     from: lssl-dev
     repo: spritsail/libressl
+    tags:
+    - latest
+    - '%label io.spritsail.version.libressl'
 
   notify:
     image: spritsail/notify
