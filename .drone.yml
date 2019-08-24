@@ -1,27 +1,60 @@
-pipeline:
-  build:
-    image: spritsail/docker-build
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  pull: always
+  image: spritsail/docker-build
+  settings:
     repo: lssl-dev
 
-  test:
-    image: docker
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    commands:
-      - docker run --rm lssl-dev /bin/sh -xec "openssl version"
+- name: test
+  pull: never
+  image: lssl-dev
+  commands:
+  - openssl version
 
-  publish:
-    image: spritsail/docker-publish
-    when: { branch: [ master ], event: [ push, tag, deployment ] }
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    secrets: [ docker_username, docker_password ]
+- name: publish
+  pull: always
+  image: spritsail/docker-publish
+  settings:
     from: lssl-dev
     repo: spritsail/libressl
     tags:
     - latest
-    - '%label io.spritsail.version.libressl'
+    - "%label io.spritsail.version.libressl"
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+    DOCKER_USERNAME:
+      from_secret: docker_username
+  when:
+    branch:
+    - master
+    event:
+    - push
+    - tag
 
-  notify:
-    image: spritsail/notify
-    when: { status: [ success, failure ] }
-    secrets: [ webhook_url, notify_token ]
+- name: notify
+  pull: always
+  image: spritsail/notify
+  environment:
+    NOTIFY_TOKEN:
+      from_secret: notify_token
+    WEBHOOK_URL:
+      from_secret: webhook_url
+  when:
+    status:
+    - success
+    - failure
+
+---
+kind: signature
+hmac: 188582f03b5b82b7b55f4c2a0cbf14a92a0ba67a031198a3eac12872ac3eca1b
+
+...

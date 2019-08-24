@@ -2,7 +2,6 @@ ARG LIBRE_VER=2.9.2
 
 FROM spritsail/debian-builder as builder
 
-ARG ARCH=x86_64
 ARG LIBRE_VER
 ARG PREFIX=/output
 
